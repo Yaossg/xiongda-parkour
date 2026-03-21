@@ -6,10 +6,9 @@ import json
 def synthesize_dialog(dialog_list):
     speeches = []
     for role_id, content in dialog_list:
-        voice_index = int(role_id)
         retries = 3
         while retries > 0:
-            tts_id = tts(voice_index, content)
+            tts_id = tts(role_id, content)
             if tts_id is not None:
                 break
             print(f"Retrying... ({3 - retries + 1}/3)")

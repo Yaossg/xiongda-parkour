@@ -14,11 +14,11 @@ dashscope.base_http_api_url = 'https://dashscope.aliyuncs.com/api/v1'
 
 TARGET_MODEL = "cosyvoice-v3.5-plus"
 
-voice_ids, labels, _ = load_roles_data()
+roles = load_roles_data()
 
 def tts(voice_index, text_to_synthesize):
     try:
-        voice_id = voice_ids[voice_index]
+        voice_id = roles[voice_index].voice_id
         synthesizer = SpeechSynthesizer(model=TARGET_MODEL, voice=voice_id)
         
         audio_data = synthesizer.call(text_to_synthesize)
@@ -29,7 +29,7 @@ def tts(voice_index, text_to_synthesize):
         with open(f"out/{tts_id}.json", "w", encoding='utf-8') as f:
             json.dump({
                 "voice_id": voice_id,
-                "label": labels[voice_index],
+                "label": roles[voice_index].label,
                 "request_id": synthesizer.get_last_request_id(),
                 "timestamp": time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()),
                 "input_text": text_to_synthesize

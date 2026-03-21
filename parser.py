@@ -14,7 +14,7 @@ def parse_dialog(file_path):
                 print(f"Warning: Skipping malformed line: {line}")
                 continue
             role_id, content = line.split(':', 1)
-            dialog.append((role_id.strip(), content.strip()))
+            dialog.append((int(role_id.strip()), content.strip()))
     return dialog
 
 if __name__ == "__main__":

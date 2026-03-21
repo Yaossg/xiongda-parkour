@@ -6,7 +6,7 @@ from parser import parse_dialog
 
 from tts import load_roles_data
 
-_, labels, colors = load_roles_data()
+roles = load_roles_data()
 
 def generate_subtitles(dialog_list, speech_ids):
     subtitles = []
@@ -36,8 +36,6 @@ def generate_subtitles(dialog_list, speech_ids):
 
 
 def subtitle_to_ass(subtitles, output_file):
-    
-    # Convert seconds to ASS time format
     def format_time(seconds):
         total_centis = int(round(seconds * 100))
         hours = total_centis // (3600 * 100)
@@ -57,12 +55,11 @@ def subtitle_to_ass(subtitles, output_file):
         f.write("Style: Default,Arial,24,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0.00,1,2.00,0.00,2,10,10,10\n")
 
 
-        for index, role_name in enumerate(labels):
-            primary = colors[index]
+        for role in roles:
             f.write(
                 "Style: {name},Arial,24,&H{primary},&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0.00,1,2.00,0.00,2,10,10,10\n".format(
-                    name=role_name,
-                    primary=primary,
+                    name=role.label,
+                    primary=role.color,
                 )
             )
         f.write("\n[Events]\n")
@@ -72,10 +69,11 @@ def subtitle_to_ass(subtitles, output_file):
             start_time = subtitle['start']
             end_time = subtitle['end']
             text = subtitle['text']
-            role_id = subtitle.get('role_id')
-            style_name = labels[int(role_id)]
+            role_id = subtitle['role_id']
+            role = roles[role_id]
+            style_name = role.label
 
-            safe_text = str(f"{style_name}: {text}").replace("{", r"\{").replace("}", r"\}")
+            safe_text = str(f"{role.prefix}{text}").replace("{", r"\{").replace("}", r"\}")
             safe_text = safe_text.replace("\n", r"\N")
 
             f.write(
