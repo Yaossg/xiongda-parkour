@@ -7,6 +7,12 @@ class Role:
     label: str
     color: str
     prefix: str
+    x: int
+    y: int
+    width: int
+    height: int
+    thinking: str
+    talking: str
 
 def load_roles_data() -> list[Role]:
     with open("in/roles.json", "r", encoding='utf-8') as f:
