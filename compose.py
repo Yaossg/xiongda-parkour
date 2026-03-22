@@ -4,12 +4,13 @@ import ffmpeg
 from parser import parse_dialog
 from probe import duration_of_audio
 from subtitle import generate_subtitles, subtitle_to_ass
+from trim import trim_all
 from roles import load_roles_data
 
 roles = load_roles_data()
 
 def concatenate_audios(audio_files, output_file):
-    inputs = [ffmpeg.input(f"out/{audio_id}.mp3") for audio_id in audio_files]
+    inputs = [ffmpeg.input(f"out/{audio_id}_trimmed.wav") for audio_id in audio_files]
     joined = ffmpeg.concat(*inputs, v=0, a=1).node
     output = ffmpeg.output(joined[0], output_file).overwrite_output()
     ffmpeg.run(output)
@@ -18,7 +19,7 @@ def mux_audio_with_video(audio_file, video_file, output_file):
     audio_input = ffmpeg.input(audio_file)
     video_input = ffmpeg.input(video_file)
 
-    duration = duration_of_audio("out/combined.mp3")
+    duration = duration_of_audio(audio_file)
 
     output = ffmpeg.output(video_input.video, audio_input.audio, output_file, vcodec='copy', acodec='aac', t=duration).overwrite_output()
     ffmpeg.run(output)
@@ -67,12 +68,14 @@ if __name__ == "__main__":
     with open("in/dialog.txt", "r", encoding='utf-8') as f:
         dialog_list = parse_dialog("in/dialog.txt")
     
+    trim_all(speech_ids)
+
     subtitles = generate_subtitles(dialog_list, speech_ids)
     
     subtitle_to_ass(subtitles, "out/subtitles.ass")
     
-    concatenate_audios(speech_ids, "out/combined.mp3")
+    concatenate_audios(speech_ids, "out/combined.wav")
     
-    mux_audio_with_video("out/combined.mp3", "in/video.mp4", "out/video_with_audio.mp4")
+    mux_audio_with_video("out/combined.wav", "in/video.mp4", "out/video_with_audio.mp4")
 
     render_video("out/video_with_audio.mp4", subtitles, "out/subtitles.ass", "out/final_video.mp4")

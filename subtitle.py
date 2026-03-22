@@ -13,11 +13,11 @@ def generate_subtitles(dialog_list, speech_ids):
     current_time = 0.0
     
     for (role_id, content), speech_id in zip(dialog_list, speech_ids):
-        audio_file = f"out/{speech_id}.mp3"
+        audio_file = f"out/{speech_id}_trimmed.wav"
         duration = duration_of_audio(audio_file)
         if duration is None:
             print(f"Skipping subtitle for {audio_file} due to probe error.")
-            continue
+            return None
         
         subtitle_entry = {
             "start": round(current_time, 2),
@@ -52,12 +52,12 @@ def subtitle_to_ass(subtitles, output_file):
         f.write("ScriptType: v4.00+\n")
         f.write("\n[V4+ Styles]\n")
         f.write("Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n")
-        f.write("Style: Default,Arial,24,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0.00,1,2.00,0.00,2,10,10,10\n")
+        f.write("Style: Default,Arial,20,&H00FFFFFF,&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0.00,1,2.00,0.00,2,10,10,10\n")
 
 
         for role in roles:
             f.write(
-                "Style: {name},Arial,24,&H{primary},&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0.00,1,2.00,0.00,2,10,10,10\n".format(
+                "Style: {name},Arial,20,&H{primary},&H000000FF,&H00000000,&H64000000,-1,0,0,0,100,100,0,0.00,1,2.00,0.00,2,10,10,10\n".format(
                     name=role.label,
                     primary=role.color,
                 )
